@@ -10,13 +10,13 @@ import { organizationsQuery } from "@/lib/data";
 export const Route = createFileRoute("/funding")({
   head: () => ({
     meta: [
-      { title: "Donations & Crowdfunding — Rebuild Together" },
+      { title: "Donations & Crowdfunding — HopeBridge" },
       {
         name: "description",
         content:
           "Support disaster recovery through verified crowdfunding campaigns and donation funds, or find financial assistance programs for your rebuild.",
       },
-      { property: "og:title", content: "Donations & Crowdfunding — Rebuild Together" },
+      { property: "og:title", content: "Donations & Crowdfunding — HopeBridge" },
     ],
   }),
   loader: ({ context }) => {

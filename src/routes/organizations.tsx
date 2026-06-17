@@ -11,13 +11,13 @@ import { organizationsQuery } from "@/lib/data";
 export const Route = createFileRoute("/organizations")({
   head: () => ({
     meta: [
-      { title: "Verified Aid Organizations & Funding — Rebuild Together" },
+      { title: "Verified Aid Organizations & Funding — HopeBridge" },
       {
         name: "description",
         content:
           "Browse a directory of verified NGOs, government programs, donors, and community funds offering disaster recovery assistance.",
       },
-      { property: "og:title", content: "Verified Aid Organizations — Rebuild Together" },
+      { property: "og:title", content: "Verified Aid Organizations — HopeBridge" },
     ],
   }),
   loader: ({ context }) => {

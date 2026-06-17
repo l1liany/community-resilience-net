@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-4 md:flex-row">
         <Logo compact />
         <p className="text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Rebuild Together Recovery Network. A platform for
+          © {new Date().getFullYear()} HopeBridge Recovery Network. A platform for
           community resilience.
         </p>
         <div className="flex gap-6 text-xs font-medium text-muted-foreground">

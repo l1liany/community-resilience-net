@@ -24,7 +24,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/report")({
   head: () => ({
-    meta: [{ title: "Report Disaster Damage — Rebuild Together" }],
+    meta: [{ title: "Report Disaster Damage — HopeBridge" }],
   }),
   component: ReportPage,
   errorComponent: RouteError,
