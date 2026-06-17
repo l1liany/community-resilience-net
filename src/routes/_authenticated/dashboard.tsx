@@ -16,7 +16,7 @@ import { myReportsQuery, organizationsQuery, type DisasterReport } from "@/lib/d
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
-    meta: [{ title: "Your Recovery Dashboard — Rebuild Together" }],
+    meta: [{ title: "Your Recovery Dashboard — HopeBridge" }],
   }),
   component: Dashboard,
   errorComponent: RouteError,

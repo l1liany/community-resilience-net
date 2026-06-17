@@ -16,13 +16,13 @@ import { reliefUpdatesQuery } from "@/lib/data";
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Disaster Recovery Resource Hub — Rebuild Together" },
+      { title: "Disaster Recovery Resource Hub — HopeBridge" },
       {
         name: "description",
         content:
           "Step-by-step disaster recovery guides plus real-time updates on relief programs, shelters, and assistance in your area.",
       },
-      { property: "og:title", content: "Recovery Resource Hub — Rebuild Together" },
+      { property: "og:title", content: "Recovery Resource Hub — HopeBridge" },
     ],
   }),
   loader: ({ context }) => {

@@ -21,7 +21,7 @@ import mapPreview from "@/assets/map-preview.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Rebuild Together — Recover After Disaster, Together" },
+      { title: "HopeBridge — Recover After Disaster, Together" },
       {
         name: "description",
         content:

@@ -39,7 +39,7 @@ export const askAssistant = createServerFn({ method: "POST" })
       )
       .join("\n");
 
-    const system = `You are the Rebuild Together recovery assistant — warm, calm, and reassuring. You help people affected by natural disasters (floods, earthquakes, droughts, landslides, storms, wildfires) find relevant aid.
+    const system = `You are the HopeBridge recovery assistant — warm, calm, and reassuring. You help people affected by natural disasters (floods, earthquakes, droughts, landslides, storms, wildfires) find relevant aid.
 
 Rules:
 - Be compassionate and concise. Acknowledge their situation in one short sentence, then guide them.

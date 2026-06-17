@@ -11,13 +11,13 @@ import mapPreview from "@/assets/map-preview.jpg";
 export const Route = createFileRoute("/map")({
   head: () => ({
     meta: [
-      { title: "Assistance Centers Near You — Rebuild Together" },
+      { title: "Assistance Centers Near You — HopeBridge" },
       {
         name: "description",
         content:
           "Find nearby disaster assistance centers, emergency shelters, and distribution points with services, hours, and contact details.",
       },
-      { property: "og:title", content: "Assistance Centers Map — Rebuild Together" },
+      { property: "og:title", content: "Assistance Centers Map — HopeBridge" },
     ],
   }),
   loader: ({ context }) => {

@@ -7,13 +7,13 @@ import { RouteError, RouteNotFound } from "@/components/route-boundaries";
 export const Route = createFileRoute("/assistant")({
   head: () => ({
     meta: [
-      { title: "AI Recovery Assistant — Rebuild Together" },
+      { title: "AI Recovery Assistant — HopeBridge" },
       {
         name: "description",
         content:
           "Describe your situation and our AI assistant recommends the most relevant disaster aid programs, grants, and community support for you.",
       },
-      { property: "og:title", content: "AI Recovery Assistant — Rebuild Together" },
+      { property: "og:title", content: "AI Recovery Assistant — HopeBridge" },
     ],
   }),
   component: Assistant,

@@ -9,13 +9,13 @@ import { supportGroupsQuery } from "@/lib/data";
 export const Route = createFileRoute("/community")({
   head: () => ({
     meta: [
-      { title: "Community Support Groups — Rebuild Together" },
+      { title: "Community Support Groups — HopeBridge" },
       {
         name: "description",
         content:
           "Join community support groups to connect with others recovering from disasters, share resources, and find or offer volunteer help.",
       },
-      { property: "og:title", content: "Community Support Groups — Rebuild Together" },
+      { property: "og:title", content: "Community Support Groups — HopeBridge" },
     ],
   }),
   loader: ({ context }) => {

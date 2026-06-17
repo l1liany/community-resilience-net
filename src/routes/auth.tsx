@@ -14,7 +14,7 @@ import { RouteError, RouteNotFound } from "@/components/route-boundaries";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign In — Rebuild Together" },
+      { title: "Sign In — HopeBridge" },
       {
         name: "description",
         content:

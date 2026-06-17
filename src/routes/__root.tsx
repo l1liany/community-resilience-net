@@ -80,14 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Rebuild Together — Recover After Disaster, Together" },
+      { title: "HopeBridge — Recover After Disaster, Together" },
       {
         name: "description",
         content:
           "Find verified aid, financial grants, recovery resources, and community support after floods, earthquakes, storms, and other disasters — all in one place.",
       },
-      { name: "author", content: "Rebuild Together" },
-      { property: "og:title", content: "Rebuild Together" },
+      { name: "author", content: "HopeBridge" },
+      { property: "og:title", content: "HopeBridge" },
       {
         property: "og:description",
         content:
