@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
 import { Route as MapRouteImport } from './routes/map'
@@ -21,6 +22,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedReportRouteImport } from './routes/_authenticated/report'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapRoute
   '/organizations': typeof OrganizationsRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/report': typeof AuthenticatedReportRoute
 }
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/organizations': typeof OrganizationsRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/report': typeof AuthenticatedReportRoute
 }
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/map': typeof MapRoute
   '/organizations': typeof OrganizationsRoute
   '/resources': typeof ResourcesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/report': typeof AuthenticatedReportRoute
 }
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/organizations'
     | '/resources'
+    | '/sitemap.xml'
     | '/dashboard'
     | '/report'
   fileRoutesByTo: FileRoutesByTo
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/organizations'
     | '/resources'
+    | '/sitemap.xml'
     | '/dashboard'
     | '/report'
   id:
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/organizations'
     | '/resources'
+    | '/sitemap.xml'
     | '/_authenticated/dashboard'
     | '/_authenticated/report'
   fileRoutesById: FileRoutesById
@@ -164,10 +176,18 @@ export interface RootRouteChildren {
   MapRoute: typeof MapRoute
   OrganizationsRoute: typeof OrganizationsRoute
   ResourcesRoute: typeof ResourcesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources': {
       id: '/resources'
       path: '/resources'
@@ -271,6 +291,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   OrganizationsRoute: OrganizationsRoute,
   ResourcesRoute: ResourcesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
