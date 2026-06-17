@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
 import { Route as FundingRouteImport } from './routes/funding'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrganizationsRoute = OrganizationsRouteImport.update({
   id: '/organizations',
   path: '/organizations',
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/funding': typeof FundingRoute
   '/organizations': typeof OrganizationsRoute
+  '/resources': typeof ResourcesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/community': typeof CommunityRoute
   '/funding': typeof FundingRoute
   '/organizations': typeof OrganizationsRoute
+  '/resources': typeof ResourcesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,20 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/funding': typeof FundingRoute
   '/organizations': typeof OrganizationsRoute
+  '/resources': typeof ResourcesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/community' | '/funding' | '/organizations'
+  fullPaths: '/' | '/community' | '/funding' | '/organizations' | '/resources'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/community' | '/funding' | '/organizations'
-  id: '__root__' | '/' | '/community' | '/funding' | '/organizations'
+  to: '/' | '/community' | '/funding' | '/organizations' | '/resources'
+  id:
+    | '__root__'
+    | '/'
+    | '/community'
+    | '/funding'
+    | '/organizations'
+    | '/resources'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,10 +82,18 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   FundingRoute: typeof FundingRoute
   OrganizationsRoute: typeof OrganizationsRoute
+  ResourcesRoute: typeof ResourcesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/organizations': {
       id: '/organizations'
       path: '/organizations'
@@ -107,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   FundingRoute: FundingRoute,
   OrganizationsRoute: OrganizationsRoute,
+  ResourcesRoute: ResourcesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
