@@ -9,7 +9,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
         }`}
         aria-hidden="true"
       >
-        R
+        H
       </div>
       <span
         className={`font-serif font-semibold tracking-tight text-foreground ${
