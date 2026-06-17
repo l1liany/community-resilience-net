@@ -19,7 +19,7 @@ export type RecommendedOrg = {
 export const askAssistant = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }): Promise<{ message: string; recommended: RecommendedOrg[] }> => {
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("The assistant is not configured yet.");
 
     const supabase = createClient<Database>(
@@ -48,9 +48,9 @@ Rules:
 - Keep the message to 2 short paragraphs. Plain, supportive language. No legal or medical guarantees.
 - Always respond with valid JSON only, matching: {"message": string, "recommendedIds": string[]}`;
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
