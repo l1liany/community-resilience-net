@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
+import { Route as MapRouteImport } from './routes/map'
 import { Route as FundingRouteImport } from './routes/funding'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +24,11 @@ const ResourcesRoute = ResourcesRouteImport.update({
 const OrganizationsRoute = OrganizationsRouteImport.update({
   id: '/organizations',
   path: '/organizations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FundingRoute = FundingRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/community': typeof CommunityRoute
   '/funding': typeof FundingRoute
+  '/map': typeof MapRoute
   '/organizations': typeof OrganizationsRoute
   '/resources': typeof ResourcesRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/community': typeof CommunityRoute
   '/funding': typeof FundingRoute
+  '/map': typeof MapRoute
   '/organizations': typeof OrganizationsRoute
   '/resources': typeof ResourcesRoute
 }
@@ -60,19 +68,27 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/community': typeof CommunityRoute
   '/funding': typeof FundingRoute
+  '/map': typeof MapRoute
   '/organizations': typeof OrganizationsRoute
   '/resources': typeof ResourcesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/community' | '/funding' | '/organizations' | '/resources'
+  fullPaths:
+    | '/'
+    | '/community'
+    | '/funding'
+    | '/map'
+    | '/organizations'
+    | '/resources'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/community' | '/funding' | '/organizations' | '/resources'
+  to: '/' | '/community' | '/funding' | '/map' | '/organizations' | '/resources'
   id:
     | '__root__'
     | '/'
     | '/community'
     | '/funding'
+    | '/map'
     | '/organizations'
     | '/resources'
   fileRoutesById: FileRoutesById
@@ -81,6 +97,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CommunityRoute: typeof CommunityRoute
   FundingRoute: typeof FundingRoute
+  MapRoute: typeof MapRoute
   OrganizationsRoute: typeof OrganizationsRoute
   ResourcesRoute: typeof ResourcesRoute
 }
@@ -99,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/organizations'
       fullPath: '/organizations'
       preLoaderRoute: typeof OrganizationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/funding': {
@@ -129,6 +153,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CommunityRoute: CommunityRoute,
   FundingRoute: FundingRoute,
+  MapRoute: MapRoute,
   OrganizationsRoute: OrganizationsRoute,
   ResourcesRoute: ResourcesRoute,
 }
