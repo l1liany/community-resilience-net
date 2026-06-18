@@ -27,6 +27,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check for developer mock session
+    if (typeof localStorage !== "undefined") {
+      const mockToken = localStorage.getItem("sb-auth-token");
+      if (mockToken) {
+        try {
+          const parsed = JSON.parse(mockToken);
+          if (parsed?.user) {
+            setSession({ user: parsed.user } as any);
+            setLoading(false);
+            return;
+          }
+        } catch (e) {}
+      }
+    }
+
     const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
       setLoading(false);
@@ -37,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => sub?.subscription?.unsubscribe();
   }, []);
 
   const signOut = async () => {

@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import {
   BookOpen,
   FileCheck,
@@ -12,6 +13,7 @@ import {
 import { PageShell } from "@/components/PageShell";
 import { RouteError, RouteNotFound } from "@/components/route-boundaries";
 import { reliefUpdatesQuery } from "@/lib/data";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
@@ -79,7 +81,14 @@ const severityStyles: Record<string, string> = {
 };
 
 function Resources() {
-  const { data: updates } = useSuspenseQuery(reliefUpdatesQuery());
+  const { data: fetchedUpdates } = useQuery(reliefUpdatesQuery());
+  const [updates, setUpdates] = useState(fetchedUpdates || []);
+
+  useEffect(() => {
+    if (fetchedUpdates) {
+      setUpdates(fetchedUpdates);
+    }
+  }, [fetchedUpdates]);
 
   return (
     <PageShell>
@@ -102,9 +111,10 @@ function Resources() {
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {guides.map((g) => (
-                <article
+                <Link
+                  to={`/resources/guides/${g.tag.toLowerCase()}`}
                   key={g.title}
-                  className="rounded-2xl border border-border bg-card p-6 transition-all hover:shadow-soft"
+                  className="rounded-2xl border border-border bg-card p-6 transition-all hover:shadow-soft block"
                 >
                   <div className="mb-4 flex size-11 items-center justify-center rounded-2xl bg-brand-100 text-brand-800">
                     <g.icon className="size-5" aria-hidden="true" />
@@ -116,7 +126,7 @@ function Resources() {
                     {g.title}
                   </h3>
                   <p className="mt-2 text-sm text-muted-foreground">{g.body}</p>
-                </article>
+                </Link>
               ))}
             </div>
           </div>
@@ -127,7 +137,7 @@ function Resources() {
               <Bell className="size-5 text-accent" aria-hidden="true" /> Live updates
             </h2>
             <div className="space-y-4">
-              {updates.map((u) => (
+              {(updates || []).map((u) => (
                 <article
                   key={u.id}
                   className="rounded-2xl border border-border bg-card p-5"

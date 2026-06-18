@@ -10,7 +10,7 @@ export function RouteError({ reset }: { error: Error; reset: () => void }) {
           This page didn't load
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong. You can try again or head back home.
+          Something went wrong: {error.message}. You can try again or head back home.
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Button

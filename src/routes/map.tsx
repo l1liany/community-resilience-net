@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { MapPin, Phone, Navigation, Clock } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { RouteError, RouteNotFound } from "@/components/route-boundaries";
 import { assistanceCentersQuery } from "@/lib/data";
-import mapPreview from "@/assets/map-preview.jpg";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 
 export const Route = createFileRoute("/map")({
   head: () => ({
@@ -29,9 +29,25 @@ export const Route = createFileRoute("/map")({
 });
 
 function MapPage() {
-  const { data: centers } = useSuspenseQuery(assistanceCentersQuery());
-  const [selectedId, setSelectedId] = useState(centers[0]?.id);
-  const selected = centers.find((c) => c.id === selectedId) ?? centers[0];
+  const { data: fetchedCenters } = useQuery(assistanceCentersQuery());
+  const [centers, setCenters] = useState(fetchedCenters || []);
+  
+  useEffect(() => {
+    if (fetchedCenters) {
+      setCenters(fetchedCenters);
+    }
+  }, [fetchedCenters]);
+
+  const [selectedId, setSelectedId] = useState((centers || [])[0]?.id);
+  const selected = (centers || []).find((c) => c.id === selectedId) ?? (centers || [])[0];
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "dummy_key"
+  });
+
+  const mapCenter = { lat: -1.2921, lng: 36.8219 };
+  const containerStyle = { width: "100%", height: "440px" };
 
   return (
     <PageShell>
@@ -50,7 +66,7 @@ function MapPage() {
           {/* List */}
           <div className="lg:col-span-2">
             <ul className="space-y-3" aria-label="Assistance centers">
-              {centers.map((c) => (
+              {(centers || []).map((c) => (
                 <li key={c.id}>
                   <button
                     type="button"
@@ -76,7 +92,7 @@ function MapPage() {
                       {c.address}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-1.5">
-                      {c.services.map((s) => (
+                      {(c.services || []).map((s) => (
                         <span
                           key={s}
                           className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
@@ -94,14 +110,31 @@ function MapPage() {
           {/* Map + detail */}
           <div className="lg:col-span-3">
             <div className="relative overflow-hidden rounded-3xl ring-1 ring-border">
-              <img
-                src={mapPreview}
-                alt="Map of assistance centers"
-                width={1440}
-                height={600}
-                loading="lazy"
-                className="h-[300px] w-full object-cover md:h-[440px]"
-              />
+              {isLoaded ? (
+                <GoogleMap
+                  mapContainerStyle={containerStyle}
+                  center={mapCenter}
+                  zoom={12}
+                  options={{
+                    disableDefaultUI: true,
+                    zoomControl: true,
+                  }}
+                >
+                  {(centers || []).map(center => (
+                    center.lat && center.lng ? (
+                      <Marker 
+                        key={center.id}
+                        position={{ lat: center.lat, lng: center.lng }}
+                        onClick={() => setSelectedId(center.id)}
+                      />
+                    ) : null
+                  ))}
+                </GoogleMap>
+              ) : (
+                <div className="flex h-[300px] w-full items-center justify-center bg-muted md:h-[440px]">
+                  Loading Map...
+                </div>
+              )}
               {selected && (
                 <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-card/95 p-6 shadow-soft backdrop-blur-sm sm:left-6 sm:right-auto sm:max-w-sm">
                   <div className="mb-3 flex items-center justify-between">
@@ -119,12 +152,16 @@ function MapPage() {
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">{selected.address}</p>
                   <div className="mt-4 flex gap-2">
-                    <Button size="sm" className="flex-1">
-                      <Navigation className="size-4" /> Get Directions
+                    <Button asChild size="sm" className="flex-1">
+                      <a href={`https://www.google.com/maps/dir/?api=1&destination=${selected.lat},${selected.lng}`} target="_blank" rel="noopener noreferrer">
+                        <Navigation className="size-4" /> Get Directions
+                      </a>
                     </Button>
                     {selected.phone && (
-                      <Button variant="outline" size="sm" aria-label="Call center">
-                        <Phone className="size-4" /> Call
+                      <Button asChild variant="outline" size="sm" aria-label="Call center">
+                        <a href={`tel:${selected.phone}`}>
+                          <Phone className="size-4" /> Call
+                        </a>
                       </Button>
                     )}
                   </div>

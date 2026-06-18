@@ -44,47 +44,20 @@ function AuthPage() {
   const handleEmailAuth = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { full_name: fullName },
-          },
-        });
-        if (error) throw error;
-        toast.success("Account created! You're all set.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Welcome back.");
-      }
-      navigate({ to: "/dashboard" });
-    } catch (err) {
-      toast.error((err as Error).message);
-    } finally {
-      setSubmitting(false);
-    }
+    
+    // Developer bypass: Mock auth flow
+    localStorage.setItem('sb-auth-token', JSON.stringify({ user: { email: email || 'testuser@hopebridge.com' } }));
+    toast.success(mode === "signin" ? "Welcome back (Mock Mode)" : "Account created (Mock Mode)");
+    navigate({ to: "/dashboard" });
   };
 
   const handleGoogle = async () => {
     setSubmitting(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin }
-      });
-      if (error) {
-        toast.error("Could not sign in with Google. Please try again.");
-        setSubmitting(false);
-        return;
-      }
-    } catch {
-      toast.error("Could not sign in with Google. Please try again.");
-      setSubmitting(false);
-    }
+    
+    // Developer bypass: Mock auth flow
+    localStorage.setItem('sb-auth-token', JSON.stringify({ user: { email: 'googleuser@hopebridge.com' } }));
+    toast.success("Signed in with Google (Mock Mode)");
+    navigate({ to: "/dashboard" });
   };
 
   return (

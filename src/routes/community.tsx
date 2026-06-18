@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Users, MessageCircle, HeartHandshake } from "lucide-react";
+import { Users, MessageCircle, HeartHandshake, X, Send, CheckSquare, UserPlus } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { Button } from "@/components/ui/button";
 import { RouteError, RouteNotFound } from "@/components/route-boundaries";
@@ -26,8 +27,116 @@ export const Route = createFileRoute("/community")({
   notFoundComponent: RouteNotFound,
 });
 
+function GroupPortalModal({ group, onClose }: { group: any, onClose: () => void }) {
+  const [chatMsg, setChatMsg] = useState("");
+  const [messages, setMessages] = useState([
+    { id: 1, user: "Amina K.", text: "We need 5 more volunteers at the distribution center.", time: "10:30 AM" },
+    { id: 2, user: "David O.", text: "On my way! Bringing extra bottled water.", time: "10:32 AM" }
+  ]);
+
+  const [tasks, setTasks] = useState([
+    { id: 1, title: "Sort donations at Mathare Social Hall", claimed: false },
+    { id: 2, title: "Distribute blankets to temporary shelter", claimed: true },
+    { id: 3, title: "Help clean up debris on Juja Road", claimed: false }
+  ]);
+
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatMsg.trim()) return;
+    setMessages([...messages, { id: Date.now(), user: "You", text: chatMsg, time: "Just now" }]);
+    setChatMsg("");
+  };
+
+  const toggleTask = (id: number) => {
+    setTasks(tasks.map(t => t.id === id ? { ...t, claimed: !t.claimed } : t));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+      <div className="w-full max-w-4xl rounded-3xl bg-card border border-border flex flex-col md:flex-row shadow-xl relative animate-in fade-in zoom-in-95 duration-200 overflow-hidden max-h-[90vh]">
+        <button onClick={onClose} className="absolute right-4 top-4 z-10 text-muted-foreground hover:text-foreground bg-card rounded-full p-1 shadow-sm">
+          <X className="size-5" />
+        </button>
+        
+        {/* Left Side: Info & Tasks */}
+        <div className="w-full md:w-1/3 bg-muted/30 p-6 border-r border-border overflow-y-auto">
+          <h2 className="font-serif text-2xl font-semibold text-foreground mb-2 pr-6">{group.name}</h2>
+          <p className="text-sm text-muted-foreground mb-4">{group.description}</p>
+          
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex -space-x-2">
+              {[1,2,3,4].map(i => (
+                <div key={i} className="size-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-xs font-bold border-2 border-card">
+                  {String.fromCharCode(64+i)}
+                </div>
+              ))}
+            </div>
+            <span className="text-xs font-medium text-muted-foreground">+{group.member_count} members</span>
+          </div>
+
+          <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+            <CheckSquare className="size-4 text-brand-500" /> Active Tasks
+          </h3>
+          <ul className="space-y-3">
+            {tasks.map(t => (
+              <li key={t.id} className="flex items-start gap-3 bg-card p-3 rounded-xl border border-border">
+                <input 
+                  type="checkbox" 
+                  checked={t.claimed}
+                  onChange={() => toggleTask(t.id)}
+                  className="mt-1 size-4 rounded border-border text-brand-500 focus:ring-brand-500"
+                />
+                <span className={`text-sm ${t.claimed ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                  {t.title}
+                </span>
+              </li>
+            ))}
+          </ul>
+          
+          <Button className="w-full mt-6" variant="outline">
+            <UserPlus className="size-4 mr-2" /> Share Invite Link
+          </Button>
+        </div>
+
+        {/* Right Side: Chat Widget */}
+        <div className="w-full md:w-2/3 flex flex-col bg-card h-[60vh] md:h-auto">
+          <div className="p-4 border-b border-border bg-muted/10 flex items-center gap-2">
+            <MessageCircle className="size-5 text-accent" />
+            <h3 className="font-semibold text-foreground">Live Community Chat</h3>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map(m => (
+              <div key={m.id} className={`flex flex-col max-w-[80%] ${m.user === "You" ? "ml-auto items-end" : "mr-auto items-start"}`}>
+                <span className="text-[10px] text-muted-foreground mb-1 px-1">{m.user} • {m.time}</span>
+                <div className={`px-4 py-2 rounded-2xl text-sm ${m.user === "You" ? "bg-accent text-accent-foreground rounded-tr-sm" : "bg-muted text-foreground rounded-tl-sm"}`}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <form onSubmit={handleSend} className="p-4 border-t border-border bg-muted/10 flex gap-2">
+            <input 
+              type="text" 
+              placeholder="Type a message..." 
+              value={chatMsg}
+              onChange={(e) => setChatMsg(e.target.value)}
+              className="flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+            <Button type="submit" size="icon" className="rounded-full shrink-0">
+              <Send className="size-4" />
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Community() {
   const { data: groups } = useSuspenseQuery(supportGroupsQuery());
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
 
   return (
     <PageShell>
@@ -63,7 +172,7 @@ function Community() {
               <p className="mt-2 flex-1 text-sm text-muted-foreground">{g.description}</p>
               <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
                 <span className="text-xs text-muted-foreground">{g.region}</span>
-                <Button size="sm" className="rounded-full">
+                <Button onClick={() => setSelectedGroup(g)} size="sm" className="rounded-full">
                   <MessageCircle className="size-4" /> Join Group
                 </Button>
               </div>
@@ -91,6 +200,10 @@ function Community() {
           </div>
         </section>
       </div>
+      
+      {selectedGroup && (
+        <GroupPortalModal group={selectedGroup} onClose={() => setSelectedGroup(null)} />
+      )}
     </PageShell>
   );
 }

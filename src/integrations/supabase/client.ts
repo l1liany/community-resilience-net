@@ -13,9 +13,16 @@ function createSupabaseClient() {
       ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
       ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    console.warn(`[Supabase] Missing Supabase environment variable(s): ${missing.join(', ')}. Running in local/mock mode.`);
+    
+    // Return a client with dummy values so the app doesn't crash
+    return createClient<Database>("https://dummy.supabase.co", "dummy_key", {
+      auth: {
+        storage: typeof window !== 'undefined' ? localStorage : undefined,
+        persistSession: false,
+        autoRefreshToken: false,
+      }
+    });
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {

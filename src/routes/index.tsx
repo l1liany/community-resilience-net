@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import {
   FileText,
   ShieldCheck,
@@ -16,7 +17,7 @@ import {
   organizationsQuery,
   assistanceCentersQuery,
 } from "@/lib/data";
-import mapPreview from "@/assets/map-preview.jpg";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -81,9 +82,25 @@ const actions = [
 
 function Index() {
   const { data: orgs } = useSuspenseQuery(organizationsQuery());
-  const { data: centers } = useSuspenseQuery(assistanceCentersQuery());
-  const nearest = centers[0];
+  const { data: fetchedCenters } = useQuery(assistanceCentersQuery());
+  const [centers, setCenters] = useState(fetchedCenters || []);
+  
+  useEffect(() => {
+    if (fetchedCenters) {
+      setCenters(fetchedCenters);
+    }
+  }, [fetchedCenters]);
+
+  const nearest = (centers || [])[0];
   const programs = orgs.slice(0, 3);
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "dummy_key"
+  });
+
+  const mapCenter = { lat: -1.2921, lng: 36.8219 };
+  const containerStyle = { width: "100%", height: "420px" };
 
   return (
     <PageShell>
@@ -145,14 +162,31 @@ function Index() {
             </Button>
           </div>
           <div className="relative overflow-hidden rounded-3xl ring-1 ring-border">
-            <img
-              src={mapPreview}
-              alt="Map showing nearby relief and assistance centers"
-              width={1440}
-              height={600}
-              loading="lazy"
-              className="h-[320px] w-full object-cover md:h-[420px]"
-            />
+            {isLoaded ? (
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={mapCenter}
+                zoom={11}
+                options={{
+                  disableDefaultUI: true,
+                  zoomControl: false,
+                  gestureHandling: "none"
+                }}
+              >
+                {(centers || []).map(center => (
+                  center.lat && center.lng ? (
+                    <Marker 
+                      key={center.id}
+                      position={{ lat: center.lat, lng: center.lng }}
+                    />
+                  ) : null
+                ))}
+              </GoogleMap>
+            ) : (
+              <div className="flex h-[320px] w-full items-center justify-center bg-muted md:h-[420px]">
+                Loading Map Preview...
+              </div>
+            )}
             {nearest && (
               <div className="absolute bottom-4 left-4 right-4 max-w-sm rounded-2xl bg-card/95 p-6 shadow-soft backdrop-blur-sm sm:bottom-6 sm:left-6">
                 <div className="mb-4 flex items-center justify-between">
@@ -169,17 +203,21 @@ function Index() {
                   {nearest.name}
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {nearest.address} • {nearest.services.slice(0, 3).join(", ")}
+                  {nearest.address} • {nearest.services?.slice(0, 3).join(", ")}
                 </p>
                 <div className="mt-4 flex gap-2">
                   <Button asChild size="sm" className="flex-1">
-                    <Link to="/map">
+                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${nearest.lat},${nearest.lng}`} target="_blank" rel="noopener noreferrer">
                       <Navigation className="size-4" /> Get Directions
-                    </Link>
+                    </a>
                   </Button>
-                  <Button variant="outline" size="sm" aria-label="Call center">
-                    <Phone className="size-4" />
-                  </Button>
+                  {nearest.phone && (
+                    <Button asChild variant="outline" size="sm" aria-label="Call center">
+                      <a href={`tel:${nearest.phone}`}>
+                        <Phone className="size-4" />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </div>
             )}

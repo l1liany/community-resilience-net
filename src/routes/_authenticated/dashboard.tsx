@@ -123,7 +123,7 @@ function Dashboard() {
                   </div>
                   <Progress value={progressFor(latest.status)} className="mt-6 h-3" />
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {latest.needs.map((n) => (
+                    {latest.needs?.map((n) => (
                       <span
                         key={n}
                         className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"

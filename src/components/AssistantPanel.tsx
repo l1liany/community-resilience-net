@@ -1,10 +1,16 @@
 import { useState, type FormEvent } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { useMutation } from "@tanstack/react-query";
 import { Sparkles, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { askAssistant, type RecommendedOrg } from "@/lib/assistant.functions";
+
+export type RecommendedOrg = {
+  id: string;
+  name: string;
+  category: "government" | "non_profit" | "community" | "donor";
+  description: string;
+  amount_label: string | null;
+  region: string;
+};
 
 const categoryLabel: Record<RecommendedOrg["category"], string> = {
   government: "Government",
@@ -15,16 +21,38 @@ const categoryLabel: Record<RecommendedOrg["category"], string> = {
 
 export function AssistantPanel({ initialSituation = "" }: { initialSituation?: string }) {
   const [situation, setSituation] = useState(initialSituation);
-  const callAssistant = useServerFn(askAssistant);
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<{ message: string; recommended: RecommendedOrg[] } | null>(null);
 
-  const mutation = useMutation({
-    mutationFn: (value: string) => callAssistant({ data: { situation: value } }),
-  });
-
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!situation.trim()) return;
-    mutation.mutate(situation.trim());
+    
+    setIsPending(true);
+    setError(null);
+    try {
+      const res = await fetch("http://localhost:5000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ situation: situation.trim() }),
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to communicate with AI backend.");
+      }
+      
+      const json = await res.json();
+
+      setData({
+        message: json.reply,
+        recommended: [],
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -53,11 +81,11 @@ export function AssistantPanel({ initialSituation = "" }: { initialSituation?: s
           </div>
           <Button
             type="submit"
-            disabled={mutation.isPending || !situation.trim()}
+            disabled={isPending || !situation.trim()}
             className="rounded-xl"
             size="lg"
           >
-            {mutation.isPending ? (
+            {isPending ? (
               <>
                 <Loader2 className="animate-spin" /> Finding aid
               </>
@@ -70,26 +98,26 @@ export function AssistantPanel({ initialSituation = "" }: { initialSituation?: s
         </div>
       </form>
 
-      {mutation.isError && (
+      {error && (
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-          {(mutation.error as Error).message}
+          {error}
         </div>
       )}
 
-      {mutation.data && (
+      {(isPending || data) && (
         <div className="animate-fade-up space-y-6">
           <div className="rounded-2xl border border-border bg-card p-6">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-accent">
-              <Sparkles className="size-4" aria-hidden="true" /> Recommendation
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" aria-hidden="true" />} Recommendation
             </div>
-            <p className="whitespace-pre-line leading-relaxed text-foreground">
-              {mutation.data.message}
+            <p className="whitespace-pre-line leading-relaxed text-foreground text-lg">
+              {isPending ? "Thinking..." : data?.message}
             </p>
           </div>
 
-          {mutation.data.recommended.length > 0 && (
+          {!isPending && data && data.recommended.length > 0 && (
             <div className="grid gap-4 sm:grid-cols-2">
-              {mutation.data.recommended.map((org) => (
+              {data.recommended.map((org) => (
                 <div
                   key={org.id}
                   className="rounded-2xl border border-border bg-card p-5"
